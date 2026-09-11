@@ -1,0 +1,125 @@
+{
+  "name": "dopnur",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A little more space to think. A local LaTeX studio with an optional AI companion.",
+  "author": "Dopnur",
+  "license": "MIT",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:ui": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "start": "electron .",
+    "test": "node --test tests/*.test.mjs",
+    "test:desktop": "node scripts/desktop-test.mjs",
+    "setup:compiler": "node scripts/setup-compiler.mjs",
+    "assets": "node scripts/create-assets.mjs",
+    "pack": "npm run build && electron-builder --dir",
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "check": "npm run build && npm test",
+    "format": "prettier --write src electron shared/templates.mjs scripts tests vite.config.ts"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/legacy-modes": "^6.5.0",
+    "@codemirror/search": "^6.5.10",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.5",
+    "@fontsource-variable/dm-sans": "^5.2.6",
+    "@fontsource/jetbrains-mono": "^5.2.5",
+    "@fontsource/lora": "^5.2.6",
+    "@lezer/highlight": "^1.2.1",
+    "diff": "^8.0.2",
+    "fflate": "^0.8.2",
+    "lucide-react": "^0.468.0",
+    "pdfjs-dist": "^6.3.289",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^7.0.2",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "electron": "^41.0.0",
+    "electron-builder": "^26.0.12",
+    "playwright": "^1.55.0",
+    "prettier": "^3.9.6",
+    "sharp": "^0.35.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "build": {
+    "appId": "studio.dopnur.desktop",
+    "productName": "Dopnur",
+    "directories": {
+      "output": "release",
+      "buildResources": "resources"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "shared/**/*",
+      "package.json",
+      "LICENSE",
+      "resources/icon.png"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "resources/icon.png",
+      "hardenedRuntime": true,
+      "extraResources": [
+        {
+          "from": "resources/bin",
+          "to": "bin",
+          "filter": [
+            "tectonic",
+            "tectonic.version.json"
+          ]
+        },
+        {
+          "from": "resources/TECTONIC-LICENSE",
+          "to": "TECTONIC-LICENSE"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "resources/icon.png",
+      "extraResources": [
+        {
+          "from": "resources/bin",
+          "to": "bin",
+          "filter": [
+            "tectonic.exe",
+            "tectonic.exe.version.json",
+            "*.dll"
+          ]
+        },
+        {
+          "from": "resources/TECTONIC-LICENSE",
+          "to": "TECTONIC-LICENSE"
+        }
+      ],
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
+  }
+}
