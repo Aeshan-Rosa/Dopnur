@@ -1,0 +1,45 @@
+name: Publish macOS release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create (for example v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run assets
+      - run: npm run setup:compiler
+      - run: npm run check
+      - run: npm run test:desktop
+      - run: npm run dist:mac
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$RELEASE_TAG" release/*.dmg release/*.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Dopnur $RELEASE_TAG" \
+            --generate-notes \
+            --target "$GITHUB_SHA"
